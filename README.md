@@ -2,8 +2,6 @@
 
 This boilerplate is setup to provide a quick way to create an extension frontend using [Vue](https://vuejs.org/) and [Laravel Mix](https://laravel.com/docs/master/mix), and a backend with Docker/Express. This is stemming from the same format of boilerplate as the [official Twitch Sample](https://github.com/twitchdev/extensions-samples).
 
-> **NOTE:** This boilerplate is somewhat a work-in-progress and is not guaranteed to make it all the way through the Twitch Extension approval process at this time.
-
 ## Dependencies
 
 You will need:
