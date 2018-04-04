@@ -1,5 +1,6 @@
-/frontend/mix-manifest.json
+/conf/
 /node_modules/
+/public/mix-manifest.json
 npm-debug.log
 yarn-error.log
 .env

@@ -1,5 +1,7 @@
 {
-    "private": true,
+    "name": "vuejs-laravel-mix-twitch-extension-boilerplate",
+    "version": "1.0.0",
+    "description": "Simple Twitch Extension leveraging VueJS and Laravel Mix. Stemming from the official Hello World repo.",
     "scripts": {
         "dev": "npm run development",
         "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -7,14 +9,33 @@
         "watch-poll": "npm run watch -- --watch-poll",
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "cert": "./bin/generate_cert.sh server",
+        "start": "node services/backend",
+        "frontend": "node services/frontend"
+    },
+    "keywords": [
+        "twitch",
+        "extension"
+    ],
+    "author": "Emily Rose <amorelandra@twitch.tv>, Colby Terry <colbydude@voidteam.net>",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "axios": "^0.18",
+        "cross-env": "^5.1",
+        "laravel-mix": "^2.0",
+        "lodash": "^4.17.4",
+        "vue": "^2.5.7",
+        "vue-router": "^3.0.0"
     },
     "devDependencies": {
-        "axios": "^0.16.2",
-        "cross-env": "^5.0.1",
-        "laravel-mix": "^1.0",
-        "lodash": "^4.17.4",
-        "vue": "^2.1.10",
-        "vue-router": "^2.7.0"
+        "boom": "^7.2.0",
+        "color": "^3.0.0",
+        "commander": "^2.15.0",
+        "hapi": "^17.2.2",
+        "inert": "^5.1.0",
+        "jsonwebtoken": "^8.2.0",
+        "request": "^2.85.0",
+        "selfsigned": "^1.10.2"
     }
 }

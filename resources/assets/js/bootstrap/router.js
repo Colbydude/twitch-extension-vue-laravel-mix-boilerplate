@@ -5,7 +5,7 @@ import Config from './../components/config';
 import LiveConfig from './../components/live-config';
 import Viewer from './../components/viewer';
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
     routes: [
@@ -26,4 +26,4 @@ export default new Router({
         }
     ],
     mode: 'history'
-})
+});

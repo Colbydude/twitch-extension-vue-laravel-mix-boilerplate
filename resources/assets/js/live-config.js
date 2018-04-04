@@ -1,7 +1,7 @@
 // Load in our JavaScript dependencies.
 require('./bootstrap/bootstrap');
 import app from './components/app';
-import router from './bootstrap/router'
+import router from './bootstrap/router';
 import Vue from 'vue';
 
 // Map global objects to Vue.

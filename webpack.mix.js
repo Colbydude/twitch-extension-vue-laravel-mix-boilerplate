@@ -11,15 +11,15 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.setPublicPath('frontend')
+mix.setPublicPath('public')
    .setResourceRoot('../')
-   .js('resources/assets/js/config.js', 'frontend/js')
-   .js('resources/assets/js/live-config.js', 'frontend/js')
-   .js('resources/assets/js/viewer.js', 'frontend/js')
+   .js('resources/assets/js/config.js', 'js')
+   .js('resources/assets/js/live-config.js', 'js')
+   .js('resources/assets/js/viewer.js', 'js')
    .options({
        uglify: false
    })
-   .sass('resources/assets/sass/app.scss', 'frontend/css')
+   .sass('resources/assets/sass/app.scss', 'css')
    .extract([
        'axios', 'lodash', 'vue', 'vue-router'
    ]);
