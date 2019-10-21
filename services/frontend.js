@@ -19,9 +19,9 @@
 // by using the `npm run frontend` command.
 
 const fs = require('fs');
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const path = require('path');
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 const color = require('color');
 const ext = require('commander');
 const jwt = require('jsonwebtoken');
@@ -46,7 +46,7 @@ const server = new Hapi.Server({
 
 (async () => { // We await top-level await ;P
     // Serve the front-end for local testing.
-    await server.register(require('inert'));
+    await server.register(require('@hapi/inert'));
     server.route({
         method: 'GET',
         path: '/{param*}',

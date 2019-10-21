@@ -15,9 +15,9 @@
  */
 
 const fs = require('fs');
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const path = require('path');
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 const color = require('color');
 const ext = require('commander');
 const jwt = require('jsonwebtoken');
