@@ -24,7 +24,7 @@
         "axios": "^0.18",
         "cross-env": "^5.1",
         "laravel-mix": "^2.0",
-        "lodash": "^4.17.4",
+        "lodash": "^4.17.13",
         "vue": "^2.5.7",
         "vue-router": "^3.0.0"
     },
