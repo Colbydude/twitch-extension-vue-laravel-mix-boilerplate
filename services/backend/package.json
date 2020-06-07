@@ -1,0 +1,14 @@
+{
+    "private": true,
+    "scripts": {
+        "backend": "node backend",
+        "start": "node backend"
+    },
+    "dependencies": {
+        "color": "^3.1.2",
+        "commander": "^5.1.0",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "request": "^2.88.2"
+    }
+}

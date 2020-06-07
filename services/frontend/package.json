@@ -1,0 +1,10 @@
+{
+    "private": true,
+    "scripts": {
+        "frontend": "node frontend",
+        "start": "node frontend"
+    },
+    "dependencies": {
+        "express": "^4.17.1"
+    }
+}

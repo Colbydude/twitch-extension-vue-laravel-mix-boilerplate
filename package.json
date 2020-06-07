@@ -1,6 +1,6 @@
 {
     "name": "vuejs-laravel-mix-twitch-extension-boilerplate",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Simple Twitch Extension leveraging VueJS and Laravel Mix. Stemming from the official Hello World repo.",
     "scripts": {
         "dev": "npm run development",
@@ -10,9 +10,11 @@
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "cert": "./bin/generate_cert.sh server",
-        "start": "node services/backend",
-        "frontend": "node services/frontend"
+
+        "cert": "./services/bin/generate_cert.sh server",
+        "backend": "node services/backend/backend",
+        "frontend": "node services/frontend/frontend",
+        "services:install": "cd services/backend && yarn install && cd ../frontend && yarn install"
     },
     "keywords": [
         "twitch",
@@ -20,24 +22,16 @@
     ],
     "author": "Emily Rose <amorelandra@twitch.tv>, Colby Terry <colbydude@voidteam.net>",
     "license": "Apache-2.0",
+    "dependencies": {
+        "axios": "^0.19.2",
+        "vue": "^2.6.11"
+    },
     "devDependencies": {
-        "@hapi/boom": "^8.0.1",
-        "@hapi/hapi": "^18.4.0",
-        "@hapi/inert": "^5.2.2",
-        "axios": "^0.19",
-        "color": "^3.0.0",
-        "commander": "^2.15.0",
-        "cross-env": "^5.1",
-        "jsonwebtoken": "^8.2.0",
-        "laravel-mix": "^4.0.7",
-        "lodash": "^4.17.13",
-        "request": "^2.85.0",
-        "resolve-url-loader": "^2.3.1",
-        "sass": "^1.20.1",
-        "sass-loader": "7.*",
-        "selfsigned": "^1.10.2",
-        "vue": "^2.5.17",
-        "vue-router": "^3.1.3",
-        "vue-template-compiler": "^2.6.10"
+        "cross-env": "^7.0.2",
+        "laravel-mix": "^5.0.4",
+        "resolve-url-loader": "3.1.0",
+        "sass": "^1.26.8",
+        "sass-loader": "8.*",
+        "vue-template-compiler": "^2.6.11"
     }
 }

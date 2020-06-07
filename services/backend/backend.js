@@ -1,28 +1,15 @@
-/**
- *    Copyright 2018 Amazon.com, Inc. or its affiliates
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
-const fs = require('fs');
-const Hapi = require('@hapi/hapi');
-const path = require('path');
-const Boom = require('@hapi/boom');
 const color = require('color');
 const ext = require('commander');
+const express = require('express');
+const fs = require('fs');
+const https = require('https');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 const request = require('request');
 
+const app = express();
+
+// Config.
 const verboseLogging = true;                // Verbose logging; Turn off for production.
 
 const initialColor = color('#6441A4');      // Super important; bleedPurple, etc.
@@ -36,15 +23,14 @@ const channelColors = {};                   // Current extension state.
 const channelCooldowns = {};                // Rate limit compliance.
 let userCooldowns = {};                     // Spam prevention.
 
-// TODO: i18n
 const STRINGS = {
     env_secret: `* Using env var for secret`,
     env_client_id: `* Using env var for client-id`,
     env_owner_id: `* Using env var for owner-id`,
     server_started: `Server running at %s`,
-    missing_secret: "Extension secret required.\nUse argument '-s <secret>' or env var 'EXT_SECRET'",
-    missing_clientId: "Extension client ID required.\nUse argument '-c <client ID>' or env var 'EXT_CLIENT_ID'",
-    missing_ownerId: "Extension owner ID required.\nUse argument '-o <owner ID>' or env var 'EXT_OWNER_ID'",
+    missing_secret: "Extension secret required.\nUse argument '-s <secret>'",
+    missing_clientId: "Extension client ID required.\nUse argument '-c <client ID>'",
+    missing_ownerId: "Extension owner ID required.\nUse argument '-o <owner ID>'",
     message_send_error: "Error sending message to channel %s",
     pubsub_response: "Message to c:%s returned %s",
     cycling_color: "Cycling color for c:%s on behalf of u:%s",
@@ -54,31 +40,11 @@ const STRINGS = {
     invalid_jwt: "Invalid JWT"
 };
 
-ext.version(require('../package.json').version)
-.option('-s, --secret <secret>', 'Extension secret')
-.option('-c, --client-id <client_id>', 'Extension client ID')
-.option('-o, --owner-id <owner_id>', 'Extension owner ID')
-.parse(process.argv);
-
-// Hacky env var support.
-const ENV_SECRET = process.env.MIX_EXT_SECRET;
-const ENV_CLIENT_ID = process.env.MIX_EXT_CLIENT_ID;
-const ENV_OWNER_ID = process.env.MIX_EXT_OWNER_ID;
-
-if (!ext.secret && ENV_SECRET) {
-    console.log(STRINGS.env_secret);
-    ext.secret = ENV_SECRET;
-}
-
-if (!ext.clientId && ENV_CLIENT_ID) {
-    console.log(STRINGS.env_client_id);
-    ext.clientId = ENV_CLIENT_ID;
-}
-
-if (!ext.ownerId && ENV_OWNER_ID) {
-    console.log(STRINGS.env_owner_id);
-    ext.ownerId = ENV_OWNER_ID;
-}
+ext.version(require('../../package.json').version)
+    .option('-s, --secret <secret>', 'Extension secret')
+    .option('-c, --client-id <client_id>', 'Extension client ID')
+    .option('-o, --owner-id <owner_id>', 'Extension owner ID')
+    .parse(process.argv);
 
 // YOU SHALL NOT PASS!
 if (!ext.secret) {
@@ -97,25 +63,10 @@ if (!ext.ownerId) {
 }
 
 // Log function that won't spam in production.
-const verboseLog = verboseLogging ? console.log.bind(console) : function() {};
+const verboseLog = verboseLogging ? console.log.bind(console) : function () { };
 
-const server = new Hapi.Server({
-    host: 'localhost',
-    port: 8081,
-    tls: { // If you need a certificate, use `npm run cert`
-        key: fs.readFileSync(path.resolve(__dirname, '../conf/server.key')),
-        cert: fs.readFileSync(path.resolve(__dirname, '../conf/server.crt')),
-    },
-    routes: {
-        cors: {
-            origin: ['*'],
-            additionalHeaders: ['cache-control', 'x-requested-with']
-        }
-    }
-});
-
-// Yse a common method for consistency.
-function verifyAndDecode(header) {
+// Methods.
+const verifyAndDecode = (header) => {
     try {
         if (!header.startsWith(bearerPrefix)) {
             return false;
@@ -130,13 +81,13 @@ function verifyAndDecode(header) {
     } catch (e) {
         return false;
     }
-}
+};
 
-function colorCycleHandler(req, h) {
+const colorCycleHandler = (req, res) => {
     // Once more with feeling: every request MUST be verified, for SAFETY!
     const payload = verifyAndDecode(req.headers.authorization);
     if (!payload) {
-        throw Boom.unauthorized(STRINGS.invalid_jwt);
+        return res.send(401, STRINGS.invalid_jwt);
     }
 
     const {
@@ -149,7 +100,7 @@ function colorCycleHandler(req, h) {
 
     // Bot abuse prevention - don't allow a single user to spam the button.
     if (userIsInCooldown(opaqueUserId)) {
-        throw Boom.tooManyRequests(STRINGS.cooldown);
+        return res.send(429, STRINGS.cooldown);
     }
 
     verboseLog(STRINGS.cycling_color, channelId, opaqueUserId);
@@ -162,14 +113,14 @@ function colorCycleHandler(req, h) {
 
     attemptColorBroadcast(channelId);
 
-    return currentColor;
-}
+    return res.send(200, currentColor);
+};
 
-function colorQueryHandler(req, h) {
+const colorQueryHandler = (req, res) => {
     // REMEMBER! Every request MUST be verified, for SAFETY!
     const payload = verifyAndDecode(req.headers.authorization);
     if (!payload) {
-        throw Boom.unauthorized(STRINGS.invalid_jwt);
+        return res.send(401, STRINGS.invalid_jwt);
     } // Seriously though.
 
     const {
@@ -181,10 +132,10 @@ function colorQueryHandler(req, h) {
 
     verboseLog(STRINGS.send_color, currentColor, opaqueUserId);
 
-    return currentColor;
-}
+    return res.send(200, currentColor);
+};
 
-function attemptColorBroadcast(channelId) {
+const attemptColorBroadcast = (channelId) => {
     // Per-channel rate limit handler.
     const now = Date.now();
     const cooldown = channelCooldowns[channelId];
@@ -203,10 +154,9 @@ function attemptColorBroadcast(channelId) {
     if (!cooldown.trigger) {
         cooldown.trigger = setTimeout(sendColorBroadcast, now - cooldown.time, channelId);
     }
-}
+};
 
-function sendColorBroadcast(channelId) {
-
+const sendColorBroadcast = (channelId) => {
     // our HTTP headers to the Twitch API
     const headers = {
         'Client-Id': ext.clientId,
@@ -228,19 +178,19 @@ function sendColorBroadcast(channelId) {
     // send our broadcast request to Twitch
     request(
         `https://api.twitch.tv/extensions/message/${channelId}`, {
-            method: 'POST',
-            headers,
-            body
-        }, (err, res) => {
-            if (err) {
-                console.log(STRINGS.messageSendError, channelId);
-            } else {
-                verboseLog(STRINGS.pubsub_response, channelId, res.statusCode);
-            }
-        });
-}
+        method: 'POST',
+        headers,
+        body
+    }, (err, res) => {
+        if (err) {
+            console.log(STRINGS.messageSendError, channelId);
+        } else {
+            verboseLog(STRINGS.pubsub_response, channelId, res.statusCode);
+        }
+    });
+};
 
-function makeServerToken(channelId) {
+const makeServerToken = (channelId) => {
     const payload = {
         exp: Math.floor(Date.now() / 1000) + serverTokenDurationSec,
         channel_id: channelId,
@@ -255,9 +205,9 @@ function makeServerToken(channelId) {
     return jwt.sign(payload, secret, {
         algorithm: 'HS256'
     });
-}
+};
 
-function userIsInCooldown(opaqueUserId) {
+const userIsInCooldown = (opaqueUserId) => {
     const cooldown = userCooldowns[opaqueUserId];
     const now = Date.now();
 
@@ -269,30 +219,37 @@ function userIsInCooldown(opaqueUserId) {
     userCooldowns[opaqueUserId] = now + userCooldownMs;
 
     return false;
-}
+};
 
-(async () => { // We await top-level await ;P
-    // Viewer wants to cycle the color.
-    server.route({
-        method: 'POST',
-        path: '/color/cycle',
-        handler: colorCycleHandler
-    });
+// Server
+// CORS.
+app.use((req, res, next) => {
+    console.log('Got request', req.path, req.method);
 
-    // New viewer is requesting the color.
-    server.route({
-        method: 'GET',
-        path: '/color/query',
-        handler: colorQueryHandler
-    });
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
-    await server.start();
+    return next();
+});
 
-    console.log(STRINGS.server_started, server.info.uri);
+// Routes.
+app.post('/color/cycle', colorCycleHandler);
+app.get('/color/query', colorQueryHandler);
+
+// HTTPS.
+let options = {
+    key: fs.readFileSync(path.resolve(__dirname, '../conf/server.key')),
+    cert: fs.readFileSync(path.resolve(__dirname, '../conf/server.crt'))
+};
+
+const PORT = 8081;
+https.createServer(options, app).listen(PORT, function () {
+    console.log(STRINGS.server_started, PORT);
 
     // Periodically clear cooldown tracking to prevent unbounded growth due to
     // per-session logged out user tokens.
-    setInterval(function() {
+    setInterval(function () {
         userCooldowns = {};
-    }, userCooldownClearIntervalMs)
-})(); // IIFE you know what I mean ;)
+    }, userCooldownClearIntervalMs);
+});

@@ -1,4 +1,4 @@
-let mix = require('laravel-mix');
+const mix = require('laravel-mix');
 
 /*
  |--------------------------------------------------------------------------
@@ -12,14 +12,16 @@ let mix = require('laravel-mix');
  */
 
 mix.setPublicPath('public')
-   .setResourceRoot('../')
-   .js('resources/assets/js/config.js', 'js')
-   .js('resources/assets/js/live-config.js', 'js')
-   .js('resources/assets/js/viewer.js', 'js')
+   .js('resources/js/config.js', 'js')
+   .js('resources/js/dashboard.js', 'js')
+   .js('resources/js/mobile.js', 'js')
+   .js('resources/js/panel.js', 'js')
+   .js('resources/js/video_component.js', 'js')
+   .js('resources/js/video_overlay.js', 'js')
+   .sass('resources/sass/app.scss', 'css')
    .options({
        uglify: false
    })
-   .sass('resources/assets/sass/app.scss', 'css')
    .extract([
-       'axios', 'lodash', 'vue', 'vue-router'
+       'axios', 'vue'
    ]);

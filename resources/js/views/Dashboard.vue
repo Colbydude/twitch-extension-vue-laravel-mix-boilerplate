@@ -15,10 +15,11 @@
 </template>
 
 <script>
-    import Viewer from './viewer';
+import Viewer from './Viewer';
 
-    // NOTE: Extends the viewer component, but changes the template.
-    export default {
-        extends: Viewer,
-    }
+// NOTE: Extends the viewer component, but changes the template.
+export default {
+    name: 'Dashboard',
+    extends: Viewer,
+}
 </script>
