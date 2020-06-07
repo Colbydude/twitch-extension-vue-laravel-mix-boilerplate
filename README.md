@@ -3,7 +3,7 @@
 This boilerplate is setup to provide a quick way to create an extension frontend using [Vue](https://vuejs.org/) and [Laravel Mix](https://laravel.com/docs/master/mix), and a backend with Hapi. This is stemming from the same format of the [official Twitch Hello World Sample](https://github.com/twitchdev/extensions-hello-world).
 
 ## Motivation
-The Hello World sample is designed to get you started building an Extension quickly. It contains all the key parts of a functioning Twitch Extension and can be immediately run in the [Developer Rig](https://github.com/twitchdev/developer-rig).
+The Hello World sample is designed to get you started building an Extension quickly. It contains all the key parts of a functioning Twitch Extension and can be immediately run in the [Developer Rig](https://dev.twitch.tv/docs/extensions/rig/).
 
 ## What's in the Sample
 The Hello World Extension provides a simple scenario that demonstrates the end to end flow of an Extension. On the frontend, a user clicks a button that can change the colour of a circle. Instead of changing the CSS locally, it calls its Extension Backend Service (EBS) to update the colour of the circle. That message is then sent via Twitch PubSub to update all clients listening to the PubSub topic.
@@ -22,16 +22,16 @@ __The sample is broken into two main components:__
 There is also a service called Frontend which can be used to serve the HTML and .JS files in lieu of using the Developer Rig. If you are using the [Developer Rig](https://github.com/twitchdev/developer-rig), you can disregard this service.
 
 ## Using the Sample
-The recommended path to using this sample is with the [Developer Rig](https://github.com/twitchdev/developer-rig). Use the Developer Rig's `extension-init` command clone this repo.
+The recommended path to using this sample is with the [Developer Rig](https://dev.twitch.tv/docs/extensions/rig/).
 
-The Developer Rig is able to host the frontend Hello World files, but the EBS must be run separately. If you want to host your frontend files other than with the Developer Rig, run `node services/frontend` at the root of your project.
+The Developer Rig is able to host the frontend Hello World files and run the EBS simultaneously.
 
 ### Configuring and Running the Extension Backend Service
-To run the EBS, run `node services/backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`
+To run the frontend, run `npm run frontend`.
+
+To run the EBS, run `npm run backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`.
 
 This provides the EBS with your Extension client ID, Extension secret and the user ID of the Extension owner (likely you). These are necessary to validate calls to your EBS and make calls to Twitch services such as PubSub.
-
-If you do not want to pass in command line arguments, you can also directly set the following environment variables: `EXT_SECRET`, `EXT_CLIENT_ID`, `EXT_OWNER_ID` in your code.
 
 You can get your client ID and secret from your [Extension Dashboard](https://dev.twitch.tv/dashboard/extensions). See the documentation for the [Developer Rig](https://github.com/twitchdev/developer-rig#configuring-the-developer-rig) for more details.
 
@@ -40,6 +40,8 @@ To get the owner ID, you will need to execute a simple CURL command against the 
 ```bash
 curl -H 'Client-ID: <client id>' -X GET 'https://api.twitch.tv/helix/users?login=<owner name>'
 ```
+
+Alternatively, you can fetch your Twitch ID using the developer rig. Select "Configuration Service" and use the ID listed under "Channel ID or Name".
 
 You will also need to generate a cert to run your EBS. See below for the steps to accomplish this.
 
