@@ -23,7 +23,7 @@
     "author": "Emily Rose <amorelandra@twitch.tv>, Colby Terry <colbydude@voidteam.net>",
     "license": "Apache-2.0",
     "dependencies": {
-        "axios": "^0.19.2",
+        "axios": "^0.21.1",
         "vue": "^2.6.11"
     },
     "devDependencies": {
