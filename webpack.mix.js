@@ -12,13 +12,13 @@ const mix = require('laravel-mix');
  */
 
 mix.setPublicPath('public')
-   .js('resources/js/config.js', 'js')
-   .js('resources/js/dashboard.js', 'js')
-   .js('resources/js/mobile.js', 'js')
-   .js('resources/js/panel.js', 'js')
-   .js('resources/js/video_component.js', 'js')
-   .js('resources/js/video_overlay.js', 'js')
-   .sass('resources/sass/app.scss', 'css')
+   .js('resources/js/config.js', 'js').vue()
+   .js('resources/js/dashboard.js', 'js').vue()
+   .js('resources/js/mobile.js', 'js').vue()
+   .js('resources/js/panel.js', 'js').vue()
+   .js('resources/js/video_component.js', 'js').vue()
+   .js('resources/js/video_overlay.js', 'js').vue()
+   .sass('resources/sass/app.scss', 'css').vue()
    .options({
        uglify: false
    })
