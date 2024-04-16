@@ -10,7 +10,6 @@
         "hot": "mix watch --hot",
         "prod": "npm run production",
         "production": "mix --production",
-
         "cert": "./services/bin/generate_cert.sh server",
         "backend": "node services/backend/backend",
         "frontend": "node services/frontend/frontend",
@@ -23,7 +22,7 @@
     "author": "Emily Rose <amorelandra@twitch.tv>, Colby Terry <colbydude@voidteam.net>",
     "license": "Apache-2.0",
     "dependencies": {
-        "axios": "^0.21.1",
+        "axios": "^1.6.8",
         "vue": "^2.6.11"
     },
     "devDependencies": {
